@@ -70,8 +70,26 @@ export class ImageViewerComponent extends Ion implements OnInit, OnDestroy, Afte
 	}
 
 	updateImageSrc(src) {
-		this.imageUrl = this._sanitizer.bypassSecurityTrustUrl(src);
-	}
+	    if (Array.isArray(src)) {
+	      let srcLen = src.length;
+	      let safeImage: SafeUrl[] = [];
+	      for (let i = 0; i < srcLen; i++) {
+		if(this.originalSrc === src[i]){
+		  this.imageCurIndex = i;
+		}
+		if(i === 0){
+		  this.imageChange = this._sanitizer.bypassSecurityTrustUrl(src[i]);
+		  safeImage = safeImage.concat(this.imageUrl);
+		  continue;
+		}
+		safeImage.push(this._sanitizer.bypassSecurityTrustUrl(src[i]));
+	      }
+	      this.imageUrl = safeImage;
+	    } else {
+	      this.originalSrc = src;
+	      this.imageUrl.push(this._sanitizer.bypassSecurityTrustUrl(src));
+	    }
+	  }
 
 	updateImageSrcWithTransition(src) {
 		const imageElement = this.image.nativeElement;
